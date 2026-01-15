@@ -1,0 +1,19 @@
+// Video Pipeline - Frame Processing Sequence Diagram
+// Render at: https://yuml.me/diagram/scruffy/sequence/
+
+// Frame Processing Flow (30fps)
+[Sensor]-raw frame>[VIF]
+[VIF]-process()>[ISP]
+[ISP]-YUV420 3840x2160>[SCL]
+[SCL]-scale(4K)>[VENC_CH0]
+[SCL]-scale(1080p)>[VENC_CH1]
+[SCL]-scale(snapshot)>[VENC_CH2]
+[VENC_CH0]-encode H265>[Prebuffer0]
+[VENC_CH1]-encode H264>[Prebuffer1]
+[VENC_CH2]-encode JPEG>[Prebuffer2]
+[Prebuffer0]-bitstream>[RTSP]
+[Prebuffer1]-bitstream>[RTSP]
+[Prebuffer2]-bitstream>[RTSP]
+[RTSP]-store(100 frames)>[Buffer]
+[RTSP]-transmit>[Clients]
+[note: 30fps = 33.3ms per cycle{bg:wheat}]

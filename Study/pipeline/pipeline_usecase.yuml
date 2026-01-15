@@ -1,0 +1,48 @@
+// Video Pipeline - Use Case Diagram
+// Render at: https://yuml.me/diagram/plain/usecase/
+
+// Actors
+[Administrator]
+[Operator]
+[RTSP Client]
+[System Monitor]
+
+// Use Cases
+(Initialize Pipeline)
+(Configure Stream)
+(Enable Stream)
+(Disable Stream)
+(Adjust Bitrate)
+(Set Resolution)
+(Enable OSD)
+(Detect Motion)
+(Monitor Performance)
+(View Live Stream)
+(Capture Snapshot)
+(Control Frame Rate)
+(Manage Prebuffer)
+
+// Relationships
+[Administrator]-(Initialize Pipeline)
+[Administrator]-(Configure Stream)
+[Operator]-(Enable Stream)
+[Operator]-(Disable Stream)
+[Operator]-(Adjust Bitrate)
+[Operator]-(Set Resolution)
+[Operator]-(Enable OSD)
+[Operator]-(Capture Snapshot)
+[Operator]-(Control Frame Rate)
+[System Monitor]-(Monitor Performance)
+[System Monitor]-(Manage Prebuffer)
+[RTSP Client]-(View Live Stream)
+
+// Extensions
+(Configure Stream)<(Set Resolution)
+(Configure Stream)<(Adjust Bitrate)
+(Configure Stream)<(Enable OSD)
+(Configure Stream)<(Control Frame Rate)
+
+// Includes
+(Enable Stream)>(Initialize Pipeline)
+(View Live Stream)>(Enable Stream)
+(Detect Motion)>(Enable Stream)

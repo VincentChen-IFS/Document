@@ -1,0 +1,23 @@
+// Video Pipeline - Rate Control State Machine Activity Diagram
+// Render at: https://yuml.me/diagram/scruffy/activity/
+
+// Rate Control State Machine
+(start)-setRateControl(mode)->(IDLE)
+(IDLE)<CBR>-monitor bitrate->(RATE_CONTROLLED_CBR)
+(IDLE)<VBR>-monitor quality->(RATE_CONTROLLED_VBR)
+(IDLE)<AVBR>-monitor variation->(RATE_CONTROLLED_AVBR)
+(RATE_CONTROLLED_CBR)-queryStats()->(STATS_READY)
+(RATE_CONTROLLED_VBR)-queryStats()->(STATS_READY)
+(RATE_CONTROLLED_AVBR)-queryStats()->(STATS_READY)
+(STATS_READY)-adjustRate()->(ADJUSTED)
+(ADJUSTED)-apply new params->(RATE_CONTROLLED_CBR)
+(ADJUSTED)-apply new params->(RATE_CONTROLLED_VBR)
+(ADJUSTED)-apply new params->(RATE_CONTROLLED_AVBR)
+(RATE_CONTROLLED_CBR)-disableRateControl()->(end)
+(RATE_CONTROLLED_VBR)-disableRateControl()->(end)
+(RATE_CONTROLLED_AVBR)-disableRateControl()->(end)
+
+// Modes:
+// CBR (Constant Bitrate) - Fixed bitrate monitoring
+// VBR (Variable Bitrate) - Quality-based monitoring
+// AVBR (Adaptive VBR) - Variation monitoring

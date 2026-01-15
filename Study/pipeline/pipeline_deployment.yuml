@@ -1,0 +1,60 @@
+// Video Pipeline - Deployment Diagram
+// Render at: https://yuml.me/diagram/plain/deployment/
+
+// Hardware Nodes
+[SigmaStar SoC|<<device>>]
+[DDR Memory|<<device>>]
+[Camera Sensor|<<device>>]
+[Ethernet PHY|<<device>>]
+
+// Software Nodes
+[Linux Kernel|<<execution environment>>]
+[MI SDK|<<library>>]
+[MediaServer App|<<executable>>]
+[RTSP Library|<<library>>]
+
+// Process Nodes
+[VIF Thread|<<process>>]
+[ISP Thread|<<process>>]
+[VENC Thread 0|<<process>>]
+[VENC Thread 1|<<process>>]
+[VENC Thread 2|<<process>>]
+[RTSP Server|<<process>>]
+
+// Memory Regions
+[VIF Ring Buffers|<<memory>>]
+[ISP Buffers|<<memory>>]
+[SCL Buffers|<<memory>>]
+[VENC Buffers|<<memory>>]
+[Prebuffer|<<memory>>]
+
+// Deployment Associations
+[Camera Sensor]->[SigmaStar SoC]
+[SigmaStar SoC]->[DDR Memory]
+[SigmaStar SoC]->[Ethernet PHY]
+
+[Linux Kernel]runs on->[SigmaStar SoC]
+[MI SDK]runs on->[Linux Kernel]
+[MediaServer App]runs on->[Linux Kernel]
+[MediaServer App]uses->[MI SDK]
+[MediaServer App]uses->[RTSP Library]
+
+[VIF Thread]part of->[MediaServer App]
+[ISP Thread]part of->[MediaServer App]
+[VENC Thread 0]part of->[MediaServer App]
+[VENC Thread 1]part of->[MediaServer App]
+[VENC Thread 2]part of->[MediaServer App]
+[RTSP Server]part of->[MediaServer App]
+
+[VIF Ring Buffers]allocated in->[DDR Memory]
+[ISP Buffers]allocated in->[DDR Memory]
+[SCL Buffers]allocated in->[DDR Memory]
+[VENC Buffers]allocated in->[DDR Memory]
+[Prebuffer]allocated in->[DDR Memory]
+
+[VIF Thread]accesses->[VIF Ring Buffers]
+[ISP Thread]accesses->[ISP Buffers]
+[VENC Thread 0]accesses->[VENC Buffers]
+[VENC Thread 1]accesses->[VENC Buffers]
+[VENC Thread 2]accesses->[VENC Buffers]
+[RTSP Server]accesses->[Prebuffer]

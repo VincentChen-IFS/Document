@@ -1,0 +1,27 @@
+// Video Pipeline - Module State Machine Activity Diagram
+// Render at: https://yuml.me/diagram/scruffy/activity/
+
+// Module Lifecycle State Machine
+(start)-initialize()->(CREATED)
+(CREATED)-configure()->(CONFIGURED)
+(CONFIGURED)-bind()->(BOUND)
+(CONFIGURED)-skip binding->(IDLE)
+(BOUND)-start()->(RUNNING)
+(IDLE)-start()->(RUNNING)
+(RUNNING)-stop()->(PAUSED)
+(PAUSED)-resume()->(RUNNING)
+(PAUSED)-destroy()->(DESTROYED)
+(RUNNING)-destroy()->(DESTROYED)
+(BOUND)-destroy()->(DESTROYED)
+(IDLE)-destroy()->(DESTROYED)
+(CONFIGURED)-destroy()->(DESTROYED)
+(DESTROYED)->(end)
+
+// States:
+// CREATED - Module initialized
+// CONFIGURED - Parameters set
+// BOUND - Connected to pipeline
+// IDLE - Standalone ready
+// RUNNING - Active processing
+// PAUSED - Temporarily stopped
+// DESTROYED - Cleaned up

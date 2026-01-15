@@ -1,0 +1,22 @@
+// Video Pipeline - Initialization Sequence Diagram
+// Render at: https://yuml.me/diagram/scruffy/sequence/
+
+// Pipeline Initialization
+[User/App]-initialize()>[Manager]
+[Manager]-create()>[VIF]
+[VIF]-->[Manager]
+[Manager]-create()>[ISP]
+[ISP]-->[Manager]
+[Manager]-create()>[SCL]
+[SCL]-->[Manager]
+[Manager]-create()>[VENC]
+[VENC]-->[Manager]
+[Manager]-bind(VIF→ISP)>[System]
+[System]-->[Manager]
+[Manager]-bind(ISP→SCL)>[System]
+[System]-->[Manager]
+[Manager]-bind(SCL→VENC)>[System]
+[System]-->[Manager]
+[Manager]-createPrebuffer()>[Prebuffer]
+[Prebuffer]-->[Manager]
+[Manager]-success>[User/App]

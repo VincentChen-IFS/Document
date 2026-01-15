@@ -1,0 +1,26 @@
+// Video Pipeline - Stream Enable/Disable Sequence Diagram
+// Render at: https://yuml.me/diagram/scruffy/sequence/
+
+// Enable Stream
+[User]-enable(streamId)>[Manager]
+[Manager]-validate()>[Config]
+[Config]-ok>[Manager]
+[Manager]-createChannel()>[VENC]
+[VENC]-ok>[Manager]
+[Manager]-configure()>[VENC]
+[VENC]-ok>[Manager]
+[Manager]-bind(SCL→VENC)>[System]
+[System]-ok>[Manager]
+[Manager]-startChannel()>[VENC]
+[VENC]-ok>[Manager]
+[Manager]-success>[User]
+
+// Disable Stream
+[User]-disable(streamId)>[Manager]
+[Manager]-stopChannel()>[VENC]
+[VENC]-ok>[Manager]
+[Manager]-unbind()>[System]
+[System]-ok>[Manager]
+[Manager]-destroyChannel()>[VENC]
+[VENC]-ok>[Manager]
+[Manager]-success>[User]

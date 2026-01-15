@@ -1,0 +1,63 @@
+// Video Pipeline - Class Diagram
+// Render at: https://yuml.me/diagram/plain/class/
+
+// Abstract base module
+[<<abstract>> PipelineModule|#moduleId:MI_MODULE_ID_e;#deviceId:MI_U32;#channelId:MI_U32;#isEnabled:MI_BOOL|+create():MI_S32;+destroy():MI_S32;+configure():MI_S32;+getStatus():ModuleStatus;+query():MI_VENC_ChnStat_t]
+
+// VIF Module
+[VIF|inputBuff[]:RingBuffer;sensorFmt:SensorFormat;nVCapGroup:MI_U32;rawBayerData:MI_U8*|+captureFrame():MI_S32;+getSensorInfo():SensorInfo;+setFrameRate(fps):MI_S32]
+[PipelineModule]^-[VIF]
+
+// ISP Module
+[ISP|procBuff[]:YUVBuffer;bayerInput:MI_U8*;yuvOutput:MI_U8*;dewarpEnabled:MI_BOOL|+processBayer():MI_S32;+applyLensCorrection():MI_S32;+setIQParams(params):MI_S32;+get3AStats():Stats]
+[PipelineModule]^-[ISP]
+
+// SCL Module
+[SCL|outBuf0:ScaleBuffer;outBuf1:ScaleBuffer;outBuf2:ScaleBuffer;scaleRatio[]:MI_F32|+setOutputResolution(port,width,height):MI_S32;+enablePort(portId):MI_S32;+disablePort(portId):MI_S32;+getPortInfo(portId):PortInfo]
+[PipelineModule]^-[SCL]
+
+// VENC Module
+[VENC|encBuff[]:EncBuffer;refFrames[]:RefFrame;mbuf:MemoryBuf;codecType:MI_VENC_MODTYPE_e;bitrate:MI_U32|+encode():MI_S32;+setRateControl(mode):MI_S32;+getNALUnit():NALUnit;+setGOP(gop):MI_S32;+queryStatus():VencStatus]
+[PipelineModule]^-[VENC]
+
+// RGN Module
+[RGN|overlayBuff:OSDBuffer;regionHandle:MI_RGN_HANDLE;canvasSize:Size|+createRegion(type):MI_S32;+attachToModule(moduleId):MI_S32;+updateBitmap(data):MI_S32;+setDisplayAttr(attr):MI_S32]
+[PipelineModule]^-[RGN]
+
+// VDF Module
+[VDF|detBuff[]:DetectionBuffer;motionThreshold:MI_F32;detectionMask:MI_U8*|+detectMotion():MI_S32;+setThreshold(val):MI_S32;+getMDResult():MDResult]
+[PipelineModule]^-[VDF]
+
+// Stream Configuration Class
+[ST_Stream_Attr_T|+bEnable:MI_BOOL;+eInputModule:MI_MODULE_ID_e;+u32InputDev:MI_U32;+u32InputChn:MI_U32;+u32InputPort:MI_U32;+u32VencDev:MI_U32;+vencChn:MI_VENC_CHN;+eType:MI_VENC_MODTYPE_e;+f32Mbps:MI_F32;+u32Width:MI_U32;+u32Height:MI_U32;+u32MaxWidth:MI_U32;+u32MaxHeight:MI_U32;+u32CropX:MI_U32;+u32CropY:MI_U32;+u32CropWidth:MI_U32;+u32CropHeight:MI_U32;+enFunc:MI_U32;+pszStreamName:char*;+eBindType:MI_SYS_BindType_e;+u32BindPara:MI_U32|+isValid():MI_BOOL;+calculateFrameSize():MI_U32;+calculateBitrate():MI_U32;+getCodecInfo():CodecInfo]
+
+// Binding Configuration Class
+[ST_SysBindPort_T|+u32SrcDevId:MI_U32;+eInputModuleId:MI_MODULE_ID_e;+u32SrcChnId:MI_U32;+u32SrcPortId:MI_U32;+u32DstDevId:MI_U32;+eOutputModuleId:MI_MODULE_ID_e;+u32DstChnId:MI_U32;+u32DstPortId:MI_U32;+u32SrcFrameRate:MI_U32;+u32DstFrameRate:MI_U32;+eBindType:MI_SYS_BindType_e;+u32BindPara:MI_U32|+validate():MI_BOOL;+getLatency():MI_U32;+getMemoryUsage():MI_U32]
+
+// Encoder Configuration Class
+[MI_VENC_ChnAttr_t|+stVencAttr:VencAttr;+stRcAttr:RateCtrlAttr;+stVuiParam:VuiParam;+stJpegParam:JpegParam;+u32Priority:MI_U32|+setCodecType(type):void;+setRateControl(mode,param):void;+setVUI(param):void;+validate():MI_S32;+getMemoryRequirement():MI_U32]
+
+[RateCtrlAttr|+eRcMode:RateControlMode;+u32BitRate:MI_U32;+u32FrameRate:MI_U32;+u32Gop:MI_U32;+u32Quality:MI_U32|+validate():MI_BOOL;+getMemory():MI_U32]
+
+[MI_VENC_ChnAttr_t]uses-.->[RateCtrlAttr]
+[note: eRcMode supports CBR/VBR/AVBR{bg:wheat}]
+
+// Pipeline Manager Class
+[MediaServerPipelineManager|-vifModule:VIF_Module;-ispModule:ISP_Module;-scalModule:SCL_Module;-vencModule:VENC_Module;-streamConfig[]:ST_Stream_Attr_T;-bindings[]:ST_SysBindPort_T;-threads:pthread_t[];-isRunning:MI_BOOL|+initialize():MI_S32;+start():MI_S32;+stop():MI_S32;+addStream(config):MI_S32;+removeStream(streamId):MI_S32;+configureStream(config):MI_S32;+bindModules(binding):MI_S32;+unbindModules(binding):MI_S32;+getStatus():PipelineStatus;+queryStream(streamId):StreamStatus;+enableStream(streamId):MI_S32;+disableStream(streamId):MI_S32;+applyISPSettings(settings):MI_S32;+getMetrics():PerformanceMetrics]
+
+[MediaServerPipelineManager]->[VIF]
+[MediaServerPipelineManager]->[ISP]
+[MediaServerPipelineManager]->[SCL]
+[MediaServerPipelineManager]->[VENC]
+[MediaServerPipelineManager]->[RGN]
+[MediaServerPipelineManager]->[VDF]
+[MediaServerPipelineManager]1-*>[ST_Stream_Attr_T]
+[MediaServerPipelineManager]1-*>[ST_SysBindPort_T]
+
+// Output Processing
+[Prebuffer|buffer[100]:NALUnit;writeIndex:MI_U32;readIndex:MI_U32;isFull:MI_BOOL|+write(nalUnit):MI_S32;+read():NALUnit;+clear():void;+getCount():MI_U32]
+
+[RTSPServer|streams[]:RTSPStream;port:MI_U16;isRunning:MI_BOOL|+addStream(name,source):MI_S32;+removeStream(name):MI_S32;+start():MI_S32;+stop():MI_S32]
+
+[VENC]->[Prebuffer]
+[Prebuffer]->[RTSPServer]

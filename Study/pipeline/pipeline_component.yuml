@@ -1,0 +1,58 @@
+// Video Pipeline - Component Diagram
+// Render at: https://yuml.me/diagram/plain/class/
+
+// High-Level Components
+[Sensor Input]
+[VIF Component]
+[ISP Component]
+[Scaler Component]
+[Encoder Component]
+[Region/OSD Component]
+[Motion Detection Component]
+[Prebuffer Component]
+[RTSP Server Component]
+[Configuration Manager]
+
+// VIF Subcomponents
+[VIF Component]<>-[Raw Bayer Capture]
+[VIF Component]<>-[Ring Buffers (4x)]
+[VIF Component]<>-[Frame Sync]
+
+// ISP Subcomponents
+[ISP Component]<>-[Bayer Processing]
+[ISP Component]<>-[Lens Correction]
+[ISP Component]<>-[3A (AE/AWB/AF)]
+[ISP Component]<>-[YUV Output]
+
+// Scaler Subcomponents
+[Scaler Component]<>-[Port 0 (Main)]
+[Scaler Component]<>-[Port 1 (Sub)]
+[Scaler Component]<>-[Port 2 (JPEG)]
+
+// Encoder Subcomponents
+[Encoder Component]<>-[H264 Encoder]
+[Encoder Component]<>-[H265 Encoder]
+[Encoder Component]<>-[JPEG Encoder]
+[Encoder Component]<>-[Rate Control]
+
+// Component Connections
+[Sensor Input]->[VIF Component]
+[VIF Component]->[ISP Component]
+[ISP Component]->[Scaler Component]
+[ISP Component]->[Region/OSD Component]
+[ISP Component]->[Motion Detection Component]
+[Scaler Component]->[Encoder Component]
+[Region/OSD Component]->[Scaler Component]
+[Motion Detection Component]->[Encoder Component]
+[Encoder Component]->[Prebuffer Component]
+[Prebuffer Component]->[RTSP Server Component]
+[Configuration Manager]->[VIF Component]
+[Configuration Manager]->[ISP Component]
+[Configuration Manager]->[Scaler Component]
+[Configuration Manager]->[Encoder Component]
+[Configuration Manager]->[Region/OSD Component]
+[Configuration Manager]->[Motion Detection Component]
+
+// External Interfaces
+[RTSP Server Component]->[Network Clients]
+[Configuration Manager]<-[Control API]

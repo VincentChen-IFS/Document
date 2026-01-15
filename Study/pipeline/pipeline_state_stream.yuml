@@ -1,0 +1,22 @@
+// Video Pipeline - Stream Processing State Machine Activity Diagram
+// Render at: https://yuml.me/diagram/scruffy/activity/
+
+// Stream Processing Lifecycle
+(start)-create stream->(DISABLED)
+(DISABLED)-enable()->(ENABLED)
+(ENABLED)-waitBuffer()->(CAPTURING)
+(CAPTURING)-encodeFrame()->(ENCODING)
+(ENCODING)-getNALUnits()->(READY_TRANSMIT)
+(READY_TRANSMIT)-next frame->(ENCODING)
+(READY_TRANSMIT)-all frames done->(ENABLED)
+(ENABLED)-disable()->(DISABLED)
+(DISABLED)-destroy()->(DESTROYED)
+(DESTROYED)->(end)
+
+// States:
+// DISABLED - Stream created but not active
+// ENABLED - Stream enabled, waiting for frames
+// CAPTURING - Frame capture in progress
+// ENCODING - Frame encoding in progress
+// READY_TRANSMIT - Encoded data ready for transmission
+// DESTROYED - Stream cleaned up

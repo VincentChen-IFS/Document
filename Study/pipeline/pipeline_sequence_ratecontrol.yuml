@@ -1,0 +1,17 @@
+// Video Pipeline - Rate Control Configuration Sequence Diagram
+// Render at: https://yuml.me/diagram/scruffy/sequence/
+
+// Rate Control Configuration
+[User/App]-setRate(mode,bitrate)>[Manager]
+[Manager]-validate(mode,bitrate)>[RateControl]
+[RateControl]-ok>[Manager]
+[Manager]-setAttr()>[VENC]
+[VENC]-setMode(CBR/VBR/AVBR)>[RateControl]
+[RateControl]-ok>[VENC]
+[VENC]-setBitrate(value)>[RateControl]
+[RateControl]-ok>[VENC]
+[VENC]-setGOP(gop)>[RateControl]
+[RateControl]-ok>[VENC]
+[VENC]-ok>[Manager]
+[Manager]-success>[User/App]
+[note: Encoding continues with new rate{bg:wheat}]
